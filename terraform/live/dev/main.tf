@@ -49,8 +49,8 @@ data "aws_secretsmanager_secret_version" "sample_config" {
 module "vpc" {
   source = "../../modules/network"
 
-  name                      = "sample-${var.env}-vpc"   # will resolve to sample-dev-vpc
-  cidr                      = var.vpc_cidr              # CIDR block for the VPC
+  name                      = "sample-${var.env}-vpc" # will resolve to sample-dev-vpc
+  cidr                      = var.vpc_cidr            # CIDR block for the VPC
   azs                       = var.vpc_availability_zones
   private_subnets           = var.vpc_private_subnets
   public_subnets            = var.vpc_public_subnets
