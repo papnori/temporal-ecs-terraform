@@ -6,11 +6,11 @@ from uuid import uuid4
 from temporalio.client import Client, WorkflowFailureError
 
 from config import settings
-from schemas.test_schema import TestSchema
-from workflows.sample_workflow import TestWorkflow
+from schemas.sample_schema import MessageSchema
+from workflows.sample_workflow import MessageWorkflow
 
 
-async def run_workflow(asrparams: TestSchema):
+async def run_workflow(asrparams: MessageSchema):
     """Run the ASR dataset workflow with given parameters."""
     # Connect to Temporal server
     client = await Client.connect(f"{settings.TEMPORAL_SERVER_ENDPOINT}:{settings.TEMPORAL_SERVER_PORT}",
@@ -22,7 +22,7 @@ async def run_workflow(asrparams: TestSchema):
     print(f"Starting my workflow...")
     try:
         result = await client.execute_workflow(
-            TestWorkflow.run,
+            MessageWorkflow.run,
             asrparams,
             id=f"test-workflow-{uuid4()}",
             task_queue="test-queue",
@@ -33,7 +33,7 @@ async def run_workflow(asrparams: TestSchema):
         print("Got expected exception: ", traceback.format_exc())
 
 
-async def run_multiple_workflows(workflow_params: List[TestSchema]):
+async def run_multiple_workflows(workflow_params: List[MessageSchema]):
     """Run multiple test workflows concurrently."""
     tasks = [run_workflow(params) for params in workflow_params]
     return await asyncio.gather(*tasks)
@@ -41,10 +41,10 @@ async def run_multiple_workflows(workflow_params: List[TestSchema]):
 
 if __name__ == "__main__":
     params_list = [
-        TestSchema(
+        MessageSchema(
             message="🦄Hello world",
         ),
-        TestSchema(
+        MessageSchema(
             message="🐰Bye world",
         ),
     ]

@@ -2,11 +2,11 @@ from time import sleep
 from typing import Any
 from temporalio import activity
 
-from schemas.test_schema import TestSchema
+from schemas.sample_schema import MessageSchema
 
 
 @activity.defn
-async def sample_activity(params: TestSchema) -> dict[str, str | Any]:
+async def message_activity(params: MessageSchema) -> dict[str, str | Any]:
     """
     A sample activity that prints a message.
     """

@@ -2,6 +2,6 @@ from dataclasses import dataclass
 
 
 @dataclass
-class TestSchema:
-    """Parameters for Test Activity."""
+class MessageSchema:
+    """Parameters for Message Activity."""
     message: str

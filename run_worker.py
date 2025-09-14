@@ -4,8 +4,8 @@ from temporalio.client import Client
 from temporalio.worker import Worker
 
 from config import settings
-from activities.sample_activity import sample_activity
-from workflows.sample_workflow import TestWorkflow
+from activities.sample_activity import message_activity
+from workflows.sample_workflow import MessageWorkflow
 
 
 async def run_worker():
@@ -21,10 +21,10 @@ async def run_worker():
     worker = Worker(
         client,
         task_queue="test-queue",  # double check it is the same as in run_workflow.py
-        workflows=[TestWorkflow],
+        workflows=[MessageWorkflow],
         # Add your other activities here
         activities=[
-            sample_activity,
+            message_activity,
         ],
         max_concurrent_workflow_tasks=10,
     )

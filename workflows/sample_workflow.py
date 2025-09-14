@@ -1,19 +1,19 @@
 from datetime import timedelta
 
 from temporalio import workflow
-from schemas.test_schema import TestSchema
+from schemas.sample_schema import MessageSchema
 
 
 @workflow.defn
-class TestWorkflow:
+class MessageWorkflow:
     @workflow.run
-    async def run(self, params: TestSchema) -> dict:
+    async def run(self, params: MessageSchema) -> dict:
         """
         Main workflow.
         """
         try:
             sample_activity_result = await workflow.execute_activity(
-                "sample_activity",
+                "message_activity",
                 params,
                 start_to_close_timeout=timedelta(minutes=3),
             )
