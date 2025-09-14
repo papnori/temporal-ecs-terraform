@@ -75,7 +75,7 @@ variable "temporal_server_endpoint" {
 variable "temporal_server_port" {
   description = "Port for the Temporal server"
   type        = number
-  default     = null
+  default     = 7233
 }
 
 variable "temporal_namespace" {
