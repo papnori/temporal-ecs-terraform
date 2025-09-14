@@ -1,0 +1,242 @@
+name: "Deploy to Dev 🚀"
+
+on:
+  # Trigger this workflow after the build workflows complete
+  workflow_run:
+    workflows:
+      - "Build & Push to ECR (Dev) 🗄️🚀"
+    types:
+      - completed
+    branches:
+      - main
+  
+  # Trigger when terraform files or workflow itself changes
+  push:
+    branches:
+      - main
+    paths:
+      - 'terraform/live/dev/**'
+      - '.github/workflows/terraform-live-dev-deploy.yaml'
+  
+  # Pull request triggers for planning
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'terraform/live/dev/**'
+      - '.github/workflows/terraform-live-dev-deploy.yaml'
+  
+  # Also allow manual triggering with optional image URI inputs
+  workflow_dispatch:
+    inputs:
+      workflow_image_uri:
+        description: 'Workflow image URI (leave empty to use latest)'
+        required: false
+        type: string
+
+
+env:
+  TERRAFORM_VERSION: 1.12.1
+  AWS_REGION: us-east-1
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Used for PR comments and checks
+  TF_IN_AUTOMATION: true  # Prevents interactive prompts during Terraform commands
+  TF_WORKING_DIR: terraform/live/dev
+  WORKFLOW_ID: ${{ github.run_id }}-${{ github.run_number }}  # Unique ID for this workflow run
+
+# Use concurrency to ensure multiple triggers don't run simultaneously
+concurrency:
+  group: terraform-dev-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false  # Don't cancel in-progress runs to prevent half-applied states
+
+jobs:
+  deploy:
+    name: "Deploy Latest Images to Dev Environment"
+    runs-on: ubuntu-latest
+    environment: 
+      name: dev  # Use the 'dev' environment for this job
+
+    # Only run if it's a PR, or if it's a workflow_run/push/workflow_dispatch (manual trigger) that succeeded
+    if: >
+      github.event_name == 'pull_request' || 
+      (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success') || 
+      github.event_name == 'workflow_dispatch' ||
+      (github.event_name == 'push' && github.ref == 'refs/heads/main')
+
+    # These environment variables are set for every step
+    env:
+        # Temporal configuration
+        TF_VAR_temporal_server_endpoint: ${{ vars.TEMPORAL_SERVER_ENDPOINT }}
+        TF_VAR_temporal_server_port: ${{ vars.TEMPORAL_SERVER_PORT }}
+        TF_VAR_temporal_namespace: ${{ vars.TEMPORAL_NAMESPACE }}
+        TF_VAR_temporal_api_key: ${{ secrets.TEMPORAL_API_KEY }}
+
+
+    permissions:
+      id-token: write   # Required for AWS OIDC authentication
+      contents: read    # Required to checkout repository
+      pull-requests: write  # Allows commenting on PRs
+    
+    defaults:
+      run:
+        working-directory: ${{ env.TF_WORKING_DIR }}
+        
+    steps:
+      # Checkout repository code  
+      - name: "Checkout repository 📦"
+        uses: actions/checkout@v4.2.2
+
+      # Configure AWS credentials using OIDC
+      - name: "Configure AWS credentials (OIDC) 🔐"
+        uses: aws-actions/configure-aws-credentials@v4.2.1
+        with:
+          role-to-assume: ${{ secrets.AWS_GITHUB_ACTIONS_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      # Log workflow trigger info for debugging
+      - name: "Log workflow trigger info 📝"
+        run: |
+          echo "Workflow triggered by: ${{ github.event_name }}"
+          echo "Workflow ID: ${{ env.WORKFLOW_ID }}"
+          if [[ "${{ github.event_name }}" == "workflow_run" ]]; then
+            echo "Triggered by workflow: ${{ github.event.workflow_run.name }}"
+            echo "Workflow conclusion: ${{ github.event.workflow_run.conclusion }}"
+          fi
+
+      # Get latest workflow image URI if not provided manually
+      - name: "Get latest workflow image URI 🔍"
+        id: workflow-image
+        if: ${{ github.event.inputs.workflow_image_uri == '' }}
+        run: |
+          # Get the latest image from the repository
+          WORKFLOW_REPO="${{ vars.WORKFLOW_ECR_REPO }}"
+          LATEST_WORKFLOW_IMAGE=$(aws ecr describe-images \
+            --repository-name $WORKFLOW_REPO \
+            --query 'sort_by(imageDetails,& imagePushedAt)[-1].imageTags[0]' \
+            --output text)
+
+          # Verify we got a valid image
+          if [[ "$LATEST_WORKFLOW_IMAGE" == "None" || -z "$LATEST_WORKFLOW_IMAGE" ]]; then
+            echo "::error::No workflow images found in repository $WORKFLOW_REPO"
+            exit 1
+          fi
+          
+          WORKFLOW_URI="${{ vars.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/$WORKFLOW_REPO:$LATEST_WORKFLOW_IMAGE"
+          echo "Using latest workflow image: $WORKFLOW_URI"
+          echo "uri=$WORKFLOW_URI" >> $GITHUB_OUTPUT
+
+
+      # Set up Terraform with specified version
+      - name: "Set up Terraform 🛠️"
+        uses: hashicorp/setup-terraform@v3.1.2
+        with:
+          terraform_version: ${{ env.TERRAFORM_VERSION }}
+
+      # Initialize Terraform
+      - name: "Terraform Init ⚙️"
+        run: terraform init
+
+      # Check Terraform formatting
+      - name: "Terraform Format Check 🧹"
+        run: terraform fmt -check -recursive
+
+      # Validate Terraform configuration files
+      - name: "Terraform Validate ✅"
+        run: terraform validate
+
+      # Generate Terraform plan with the latest images
+      - name: "Terraform Plan with Updated Images 📋"
+        id: plan
+        run: |
+          # Use provided image URIs if available, otherwise use the ones we found
+          WORKFLOW_IMAGE_URI="${{ github.event.inputs.workflow_image_uri || steps.workflow-image.outputs.uri }}"
+
+          echo "workflow_uri=$WORKFLOW_IMAGE_URI" >> $GITHUB_OUTPUT
+          
+          # Create the plan
+          terraform plan \
+            -var="worker_container_image=$WORKFLOW_IMAGE_URI" \
+            -out=tfplan
+        continue-on-error: false
+      
+      # Post Terraform plan results as PR comment
+      - name: "Post Plan Results in PR Comments 💬"
+        if: github.event_name == 'pull_request' && github.event.pull_request.state == 'open' && steps.plan.outcome == 'success'
+        uses: Jimdo/terraform-pr-commenter@v1.8.0
+        with:
+          commenter_type: plan
+          commenter_input: ${{ format('{0}{1}', steps.plan.outputs.stdout, steps.plan.outputs.stderr) }}
+          commenter_exitcode: ${{ steps.plan.outputs.exitcode }}
+
+      # Apply Terraform plan - only for non-PR events
+      - name: "Terraform Apply with Updated Image 🚀"
+        if: >
+          github.event_name != 'pull_request' && 
+          (github.event_name == 'workflow_run' || 
+           github.event_name == 'workflow_dispatch' || 
+           (github.event_name == 'push' && github.ref == 'refs/heads/main'))
+        run: |
+          terraform apply -auto-approve tfplan
+      
+      # Output Terraform deployment outputs after apply
+      - name: "Post Apply Output 📤"
+        if: >
+          github.event_name != 'pull_request' && 
+          (github.event_name == 'workflow_run' || 
+           github.event_name == 'workflow_dispatch' || 
+           (github.event_name == 'push' && github.ref == 'refs/heads/main'))
+        run: terraform output
+
+      # Verify ECS services stability after deployment
+      - name: "Verify ECS Service Stability 📝🩺"
+        if: >
+          github.event_name != 'pull_request' && 
+          (github.event_name == 'workflow_run' || 
+           github.event_name == 'workflow_dispatch' || 
+           (github.event_name == 'push' && github.ref == 'refs/heads/main'))
+        timeout-minutes: 10
+        run: |
+          # Wait for ECS services to stabilize
+          echo "Waiting for service to stabilize..."
+          aws ecs wait services-stable \
+            --cluster sample-dev-cluster \
+            --services sample-dev-temporal-worker
+
+          echo "Services are stable!"
+
+      # Publish deployment summary to GitHub Action summary
+      - name: "Publish Deployment Status 📊"
+        if: >
+          github.event_name != 'pull_request' && 
+          (github.event_name == 'workflow_run' || 
+           github.event_name == 'workflow_dispatch' || 
+           (github.event_name == 'push' && github.ref == 'refs/heads/main')) && 
+          success()
+        run: |
+          # Extract versions from URIs for a cleaner display
+          WORKFLOW_URI="${{ steps.plan.outputs.workflow_uri }}"
+          
+          WORKFLOW_VERSION=$(echo "$WORKFLOW_URI" | awk -F: '{print $NF}')
+          
+          echo "## Deployment Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "🚀 **Environment:** Development" >> $GITHUB_STEP_SUMMARY
+          echo "🏷️ **WORKFLOW Version:** $WORKFLOW_VERSION" >> $GITHUB_STEP_SUMMARY
+          echo "⏰ **Deployment Time:** $(date -u '+%Y-%m-%d %H:%M:%S UTC')" >> $GITHUB_STEP_SUMMARY
+          echo "🆔 **Workflow ID:** ${{ env.WORKFLOW_ID }}" >> $GITHUB_STEP_SUMMARY
+          echo "🔄 **Trigger:** ${{ github.event_name }}" >> $GITHUB_STEP_SUMMARY
+      
+      # Clean up plan file regardless of workflow result
+      - name: "Clean up plan file 🧽"
+        if: always()
+        run: rm -f tfplan
+
+      # Send deployment notification
+      - name: "Send Deployment Notification 📢"
+        if: >
+          github.event_name != 'pull_request' && 
+          (github.event_name == 'workflow_run' || 
+           github.event_name == 'workflow_dispatch' || 
+           (github.event_name == 'push' && github.ref == 'refs/heads/main')) && 
+          success()
+        run: |
+          echo "Deployment succeeded!"

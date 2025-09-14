@@ -1,0 +1,83 @@
+name: "Build & Push to ECR (Dev) 🗄️🚀"
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'activities/**'
+      - 'workflows/**'
+      - 'schemas/**'
+      - 'run_worker.py'
+      - 'run_workflow.py'
+      - 'config.py'
+      - '.github/workflows/backend-build-and-publish-ecr-dev.yaml'
+  workflow_dispatch:
+    # Allows manual triggering from the GitHub Actions UI
+
+
+jobs:
+  build-and-push:
+    name: Build and Push Docker Image to ECR (Dev) 🛠️
+    runs-on: ubuntu-latest
+    environment:
+      name: dev  # Use the 'dev' environment for this job
+
+    # These environment variables are set for every step from here on out
+    env:
+      AWS_REGION: us-east-1
+      GITHUB_SHA: ${{ github.sha }}  # Full SHA of the commit
+
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      # Checkout repository code
+      - name: Checkout code 🛎️
+        uses: actions/checkout@v4.2.2
+
+      # Set up AWS credentials for this workflow
+      - name: Configure AWS credentials (OIDC) 🔐
+        uses: aws-actions/configure-aws-credentials@v4.2.1
+        with:
+          role-to-assume: ${{ secrets.AWS_GITHUB_ACTIONS_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      # Authenticate Docker to Amazon ECR
+      - name: Login to Amazon ECR 🔑
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2.0.1
+
+      # Set IMAGE_TAG to short SHA for Docker image versioning
+      - name: Set Short SHA as IMAGE_TAG 🏷️
+        id: github_sha_hash
+        # This will result in a tag like "backend-main-abc1234"
+        # where "main" is the branch name and "abc1234" is the short SHA
+        run: |
+          SAFE_REF="${GITHUB_REF_NAME//\//-}"
+          echo "Sanitized branch name: $SAFE_REF"
+          echo "IMAGE_TAG=backend-${SAFE_REF}-${GITHUB_SHA:0:7}" >> $GITHUB_ENV
+
+      # Build and tag Docker image
+      - name: Build, tag and push Docker image to AWS ECR 🛠️ 🐳 🚀
+        env:
+          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          REPOSITORY: ${{ vars.WORKFLOW_ECR_REPO }}
+          IMAGE_TAG: ${{ env.IMAGE_TAG }}
+        run: |
+          set -e
+          docker build -t $REGISTRY/$REPOSITORY:$IMAGE_TAG .
+          docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
+
+      # Output image URI for use in other jobs or logs
+      - name: Output image URI 📢
+        id: output-image
+        env:
+          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          REPOSITORY: ${{ vars.WORKFLOW_ECR_REPO }}
+          IMAGE_TAG: ${{ env.IMAGE_TAG }}
+        run: |
+          IMAGE_URI="$REGISTRY/$REPOSITORY:$IMAGE_TAG"
+          echo "Pushed image: $IMAGE_URI"
+          echo "image_uri=$IMAGE_URI" >> $GITHUB_OUTPUT
