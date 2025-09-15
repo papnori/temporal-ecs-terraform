@@ -108,24 +108,24 @@ variable "autoscaling_min_capacity" {
 variable "autoscaling_policies" {
   description = "A map of autoscaling policies for the ECS service."
   type        = any
-  default = {
-    cpu = {
-      policy_type = "TargetTrackingScaling"
-
-      target_tracking_scaling_policy_configuration = {
-        predefined_metric_specification = {
-          predefined_metric_type = "ECSServiceAverageCPUUtilization"
-        }
-      }
-    }
-    memory = {
-      policy_type = "TargetTrackingScaling"
-
-      target_tracking_scaling_policy_configuration = {
-        predefined_metric_specification = {
-          predefined_metric_type = "ECSServiceAverageMemoryUtilization"
-        }
-      }
-    }
-  }
+#   default = {
+#     cpu = {
+#       policy_type = "TargetTrackingScaling"
+#
+#       target_tracking_scaling_policy_configuration = {
+#         predefined_metric_specification = {
+#           predefined_metric_type = "ECSServiceAverageCPUUtilization"
+#         }
+#       }
+#     }
+#     memory = {
+#       policy_type = "TargetTrackingScaling"
+#
+#       target_tracking_scaling_policy_configuration = {
+#         predefined_metric_specification = {
+#           predefined_metric_type = "ECSServiceAverageMemoryUtilization"
+#         }
+#       }
+#     }
+#   }
 }
