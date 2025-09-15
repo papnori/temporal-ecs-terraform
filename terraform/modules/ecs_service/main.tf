@@ -33,7 +33,6 @@ module "ecs_service" {
 
   # Autoscaling configuration
   autoscaling_max_capacity = var.autoscaling_max_capacity
-  # desired_count            = var.autoscaling_min_capacity
   autoscaling_min_capacity = var.autoscaling_min_capacity
   autoscaling_policies     = var.autoscaling_policies
 
