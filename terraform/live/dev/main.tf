@@ -138,6 +138,7 @@ resource "aws_appautoscaling_policy" "worker_cpu_step_up" {
   resource_id        = "service/${module.cluster.ecs_cluster_name}/sample-${var.env}-temporal-worker"
   scalable_dimension = "ecs:service:DesiredCount"
   policy_type        = "StepScaling"
+  depends_on = [module.worker_service]
 
   step_scaling_policy_configuration {
     adjustment_type         = "ChangeInCapacity"
@@ -159,6 +160,7 @@ resource "aws_appautoscaling_policy" "worker_cpu_step_down" {
   resource_id        = "service/${module.cluster.ecs_cluster_name}/sample-${var.env}-temporal-worker"
   scalable_dimension = "ecs:service:DesiredCount"
   policy_type        = "StepScaling"
+  depends_on = [module.worker_service]
 
   step_scaling_policy_configuration {
     adjustment_type         = "ChangeInCapacity"
