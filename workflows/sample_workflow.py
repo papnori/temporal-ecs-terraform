@@ -13,7 +13,7 @@ class MessageWorkflow:
         """
         try:
             sample_activity_result = await workflow.execute_activity(
-                "message_activity",
+                "save_message_activity",
                 params,
                 start_to_close_timeout=timedelta(minutes=3),
             )
