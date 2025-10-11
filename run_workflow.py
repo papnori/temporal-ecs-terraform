@@ -6,11 +6,11 @@ from uuid import uuid4
 from temporalio.client import Client, WorkflowFailureError
 
 from config import settings
-from schemas.sample_schema import MessageSchema
+from schemas.sample_schema import SaveMessageSchema
 from workflows.sample_workflow import MessageWorkflow
 
 
-async def run_workflow(asrparams: MessageSchema):
+async def run_workflow(asrparams: SaveMessageSchema):
     """Run the ASR dataset workflow with given parameters."""
     # Connect to Temporal server
     client = await Client.connect(f"{settings.TEMPORAL_SERVER_ENDPOINT}:{settings.TEMPORAL_SERVER_PORT}",
@@ -33,7 +33,7 @@ async def run_workflow(asrparams: MessageSchema):
         print("Got expected exception: ", traceback.format_exc())
 
 
-async def run_multiple_workflows(workflow_params: List[MessageSchema]):
+async def run_multiple_workflows(workflow_params: List[SaveMessageSchema]):
     """Run multiple test workflows concurrently."""
     tasks = [run_workflow(params) for params in workflow_params]
     return await asyncio.gather(*tasks)
@@ -41,10 +41,10 @@ async def run_multiple_workflows(workflow_params: List[MessageSchema]):
 
 if __name__ == "__main__":
     params_list = [
-        MessageSchema(
+        SaveMessageSchema(
             message="🦄Hello world",
         ),
-        MessageSchema(
+        SaveMessageSchema(
             message="🐰Bye world",
         ),
     ]

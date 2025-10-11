@@ -6,6 +6,7 @@ name = "pypi"
 [packages]
 temporalio = "1.17.0"
 pydantic-settings = "*"
+boto3 = "*"
 
 [dev-packages]
 

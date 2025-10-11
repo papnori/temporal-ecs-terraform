@@ -1,18 +1,40 @@
-from time import sleep
+import os
+import boto3
+from botocore.config import Config
 from typing import Any
 from temporalio import activity
 
-from schemas.sample_schema import MessageSchema
+from schemas.sample_schema import SaveMessageSchema
 
 
 @activity.defn
-async def message_activity(params: MessageSchema) -> dict[str, str | Any]:
+async def save_message_activity(params: SaveMessageSchema) -> dict[str, str | Any]:
     """
-    A sample activity that prints a message.
+    A sample activity to save message to S3.
     """
-    print("Preparing to print message")
-    sleep(5)
-    print(params.message)
-    print("Phew... done printing!")
-    return {"printed_message": params.message,
+    print("Preparing to save message")
+
+    try:
+        # Create a temporary file with the message
+        with open(params.file_name, "w") as file:
+            file.write(params.message)
+
+        # Configure boto3 client with retries
+        config = Config(
+            retries={'max_attempts': 3, 'mode': 'adaptive'},
+            region_name='us-east-1'
+        )
+        s3_client = boto3.client('s3', config=config)
+        s3_client.upload_file(params.file_name, params.bucket_name, params.file_name)
+
+        # Clean up the temporary file
+        os.remove(params.file_name)
+
+    except Exception as e:
+        print(f"S3 upload failed: {str(e)}")
+        raise Exception(f"S3 upload failed: {str(e)}") from e
+
+    print("Phew... done saving!")
+    return {"saved_message": params.message,
+            "s3_path": f"s3://{params.bucket_name}/{params.file_name}",
             "status": "completed"}
