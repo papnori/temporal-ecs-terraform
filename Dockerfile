@@ -21,17 +21,8 @@ RUN pip install --no-cache-dir pipenv && \
 # Copy the application code
 COPY . .
 
-# Create directories for data storage
-RUN mkdir -p /data/input /data/output
-
 # Set environment variables
 ENV PYTHONUNBUFFERED=1
-
-# Expose the port Health check will run on
-EXPOSE 8080
-
-# Expose the port Temporal will run on
-EXPOSE 7233
 
 # Run the worker
 CMD ["python", "run_worker.py"]
