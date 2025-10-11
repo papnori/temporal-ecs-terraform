@@ -280,3 +280,30 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "message_storage" 
     }
   }
 }
+
+# Add S3 access permissions to the task role
+resource "aws_iam_role_policy" "ecs_s3_access" {
+  name = "s3-access-policy"
+  role = module.worker_service.task_role_name
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "s3:GetObject",
+          "s3:PutObject",
+          "s3:ListBucket",
+          "s3:DeleteObject",
+          "s3:GetBucketLocation"
+
+        ]
+        Resource = [
+          "arn:aws:s3:::my-little-sample-message-storage-dev",
+          "arn:aws:s3:::my-little-sample-message-storage-dev/*"
+        ]
+      }
+    ]
+  })
+}
