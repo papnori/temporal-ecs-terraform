@@ -9,9 +9,6 @@ __pycache__/
 env/
 venv/
 
-# Ignore Pipenv files
-Pipfile.lock
-
 # Ignore development files
 *.md
 
