@@ -57,24 +57,20 @@ module "vpc" {
   enable_nat_gateway        = local.vpc_nat_gateway_enabled
   enable_single_nat_gateway = local.vpc_single_nat_gateway_enabled
 
+
+  vpc_endpoints = {
+    s3 = {
+      service         = "s3"
+      service_type    = "Gateway"
+      route_table_ids = flatten([module.vpc.private_route_table_ids])
+    }
+  }
+
   tags = {
     VPC = "sample-${var.env}"
   }
 }
 
-
-module "vpc_endpoint" {
-  source  = "terraform-aws-modules/vpc/aws//modules/vpc-endpoints"
-  version = "5.21.0"
-  vpc_id  = module.vpc.vpc_id
-  endpoints = {
-    s3 = {
-      service         = "s3"
-      service_type    = "Gateway"
-      route_table_ids = flatten([module.vpc.private_route_table_ids])
-    },
-  }
-}
 
 ###############################################################################
 # ECS Cluster
@@ -138,7 +134,7 @@ resource "aws_appautoscaling_policy" "worker_cpu_step_up" {
   resource_id        = "service/${module.cluster.ecs_cluster_name}/sample-${var.env}-temporal-worker"
   scalable_dimension = "ecs:service:DesiredCount"
   policy_type        = "StepScaling"
-  depends_on = [module.worker_service]
+  depends_on         = [module.worker_service]
 
   step_scaling_policy_configuration {
     adjustment_type         = "ChangeInCapacity"
@@ -160,7 +156,7 @@ resource "aws_appautoscaling_policy" "worker_cpu_step_down" {
   resource_id        = "service/${module.cluster.ecs_cluster_name}/sample-${var.env}-temporal-worker"
   scalable_dimension = "ecs:service:DesiredCount"
   policy_type        = "StepScaling"
-  depends_on = [module.worker_service]
+  depends_on         = [module.worker_service]
 
   step_scaling_policy_configuration {
     adjustment_type         = "ChangeInCapacity"
