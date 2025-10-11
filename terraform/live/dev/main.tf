@@ -248,3 +248,35 @@ module "worker_service" {
     }
   }
 }
+
+###########################################################################
+# S3 Bucket for Application Data
+###########################################################################
+
+resource "aws_s3_bucket" "message_storage" {
+  bucket = "my-little-sample-message-storage-dev"
+
+  tags = {
+    Name        = "Message Storage Bucket"
+    Environment = var.env
+    Project     = "Sample"
+  }
+}
+
+resource "aws_s3_bucket_versioning" "message_storage" {
+  bucket = aws_s3_bucket.message_storage.id
+
+  versioning_configuration {
+    status = "Enabled"
+  }
+}
+
+resource "aws_s3_bucket_server_side_encryption_configuration" "message_storage" {
+  bucket = aws_s3_bucket.message_storage.id
+
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm = "AES256"
+    }
+  }
+}
