@@ -11,6 +11,7 @@ on:
       - 'run_worker.py'
       - 'run_workflow.py'
       - 'config.py'
+      - 'Dockerfile'
       - '.github/workflows/backend-build-and-publish-ecr-dev.yaml'
   workflow_dispatch:
     # Allows manual triggering from the GitHub Actions UI
