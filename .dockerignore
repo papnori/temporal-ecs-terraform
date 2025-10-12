@@ -11,10 +11,20 @@ venv/
 
 # Ignore development files
 *.md
+*.zip
 
-# Ignore version control directories and files
+
+# Ignore version control directories and files and actions
 .git/
+.github/
 .gitignore
+
+# Ignore Terraform files and directories
+*.tf
+*.tfstate
+*.tfstate.*
+.terraform/
+.terraform.lock.hcl
 
 # Ignore Docker-related files
 Dockerfile
