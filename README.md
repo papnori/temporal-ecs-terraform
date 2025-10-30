@@ -387,8 +387,6 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## 📧 Contact
 
-**Nora** — [nori.753@gmail.com](mailto:nori.753@gmail.com)
-
 - LinkedIn: [@norapap753](https://www.linkedin.com/in/norapap753/)
 - Project: [Skinsight.me](https://skinsight.me/) 💜
 

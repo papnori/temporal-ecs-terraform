@@ -276,8 +276,6 @@ Found an issue or have a suggestion? Feel free to open a PR or issue in the [mai
 
 ## 📧 Questions?
 
-**Nora** — [nori.753@gmail.com](mailto:nori.753@gmail.com)
-
 - LinkedIn: [@norapap753](https://www.linkedin.com/in/norapap753/)
 - Project: [Skinsight.me](https://skinsight.me/) 💜
 
