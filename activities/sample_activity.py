@@ -15,8 +15,12 @@ async def save_message_activity(params: SaveMessageSchema) -> dict[str, str | An
     print("Preparing to save message")
 
     try:
-        # Create a temporary file with the message
-        with open(params.file_name, "w") as file:
+        # Create a file with the current timestamp and save the message to it
+        timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+        file_name = f"saved_message_log_{timestamp}.txt"
+        print(f"Saving message to {file_name}")
+
+        with open(file_name, "w") as file:
             file.write(params.message)
 
         # Configure boto3 client with retries
