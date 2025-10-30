@@ -2,7 +2,4 @@
 .venv
 .env
 __pycache__/
-.DS_Store
-*.pyc
-*.pyo
-*.log
+

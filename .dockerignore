@@ -1,49 +1,77 @@
-# Ignore Python cache files
-__pycache__/
-*.pyc
-*.pyo
-*.pyd
-
-# Ignore virtual environment directories
-.venv/
-env/
-venv/
-
-# Ignore development files
-*.md
-*.zip
-
-
-# Ignore version control directories and files and actions
-.git/
-.github/
+# Git and version control
+.git
 .gitignore
 
-# Ignore Terraform files and directories
-*.tf
-*.tfstate
-*.tfstate.*
-.terraform/
-.terraform.lock.hcl
+# Python cache and build artifacts
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
 
-# Ignore Docker-related files
+# Virtual environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Terraform files (not needed in container)
+terraform/
+*.tfstate
+*.tfstate.backup
+*.tfvars
+.terraform/
+
+# Local development files
+local-temporal-server/
+docker-compose.yml
+README.md
+*.md
+
+# CSS files (not needed for worker)
+*.css
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Documentation and development files
+docs/
+*.log
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Docker related
 Dockerfile
 .dockerignore
-
-# Ignore IDE and editor directories and files
-.idea/
-.vscode/
-*.swp
-
-# Ignore build directories
-build/
-dist/
-
-# Ignore configuration files
-.env
-.env_sample
-
-# Ignore other unnecessary files
-.cache/
-.DS_Store
-*.log
