@@ -11,8 +11,7 @@ on:
       - 'run_worker.py'
       - 'run_workflow.py'
       - 'config.py'
-      - 'Dockerfile'
-      - '.github/workflows/backend-build-and-publish-ecr-dev.yaml'
+      - '.github/workflows/build-and-publish-ecr-dev.yaml'
   workflow_dispatch:
     # Allows manual triggering from the GitHub Actions UI
 
@@ -53,12 +52,12 @@ jobs:
       # Set IMAGE_TAG to short SHA for Docker image versioning
       - name: Set Short SHA as IMAGE_TAG 🏷️
         id: github_sha_hash
-        # This will result in a tag like "backend-main-abc1234"
+        # This will result in a tag like "temporal-worker-main-abc1234"
         # where "main" is the branch name and "abc1234" is the short SHA
         run: |
           SAFE_REF="${GITHUB_REF_NAME//\//-}"
           echo "Sanitized branch name: $SAFE_REF"
-          echo "IMAGE_TAG=backend-${SAFE_REF}-${GITHUB_SHA:0:7}" >> $GITHUB_ENV
+          echo "IMAGE_TAG=temporal-worker-${SAFE_REF}-${GITHUB_SHA:0:7}" >> $GITHUB_ENV
 
       # Build and tag Docker image
       - name: Build, tag and push Docker image to AWS ECR 🛠️ 🐳 🚀

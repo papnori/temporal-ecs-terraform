@@ -36,7 +36,7 @@ on:
 
 
 env:
-  TERRAFORM_VERSION: 1.12.1
+  TERRAFORM_VERSION: 1.13.3
   AWS_REGION: us-east-1
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Used for PR comments and checks
   TF_IN_AUTOMATION: true  # Prevents interactive prompts during Terraform commands
@@ -52,7 +52,7 @@ jobs:
   deploy:
     name: "Deploy Latest Images to Dev Environment"
     runs-on: ubuntu-latest
-    environment: 
+    environment:
       name: dev  # Use the 'dev' environment for this job
 
     # Only run if it's a PR, or if it's a workflow_run/push/workflow_dispatch (manual trigger) that succeeded
@@ -64,12 +64,8 @@ jobs:
 
     # These environment variables are set for every step
     env:
-        # Temporal configuration
-        TF_VAR_temporal_server_endpoint: ${{ vars.TEMPORAL_SERVER_ENDPOINT }}
-        TF_VAR_temporal_server_port: ${{ vars.TEMPORAL_SERVER_PORT }}
-        TF_VAR_temporal_namespace: ${{ vars.TEMPORAL_NAMESPACE }}
-        TF_VAR_temporal_api_key: ${{ secrets.TEMPORAL_API_KEY }}
-
+      # Terraform environment variable for setting application bucket name
+      TF_VAR_s3_data_bucket_name: ${{ vars.S3_DATA_BUCKET_NAME }}
 
     permissions:
       id-token: write   # Required for AWS OIDC authentication
