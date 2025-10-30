@@ -1,4 +1,3 @@
-import traceback
 from datetime import timedelta
 
 from temporalio import workflow
@@ -20,11 +19,9 @@ class MessageWorkflow:
             )
 
             return {
-                "saved_message": sample_activity_result["saved_message"],
+                "printed_message": sample_activity_result["saved_message"],
                 "status": "completed",
             }
 
         except Exception as e:
             print(f"Workflow failed: {str(e)}")
-            print("Traceback:")
-            print(traceback.format_exc())
