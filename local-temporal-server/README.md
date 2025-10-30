@@ -287,7 +287,7 @@ Found an issue or have a suggestion? Feel free to open a PR or issue in the [mai
 
 **Happy local development! 🚀**
 
-Made with 🧙‍♂️ by Nori
+Made with ☕️and ✨ by Nora
 
 </div>
 
