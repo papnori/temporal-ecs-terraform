@@ -10,10 +10,14 @@ from schemas.sample_schema import SaveMessageSchema
 from workflows.sample_workflow import MessageWorkflow
 
 
-async def run_workflow(asrparams: SaveMessageSchema):
-    """Run the ASR dataset workflow with given parameters."""
+async def run_workflow(params: SaveMessageSchema):
+    """Run the save message workflow with the given parameters."""
+
     # Connect to Temporal server
-    client = await Client.connect(f"{settings.TEMPORAL_SERVER_ENDPOINT}:{settings.TEMPORAL_SERVER_PORT}",
+    url = f"{settings.TEMPORAL_SERVER_ENDPOINT}:{settings.TEMPORAL_SERVER_PORT}" if settings.TEMPORAL_SERVER_PORT else settings.TEMPORAL_SERVER_ENDPOINT
+
+    print(f"Connecting to Temporal server at {url} ...")
+    client = await Client.connect(url,
                                   namespace=settings.TEMPORAL_NAMESPACE,
                                   api_key=settings.TEMPORAL_API_KEY,
                                   tls=True
@@ -23,7 +27,7 @@ async def run_workflow(asrparams: SaveMessageSchema):
     try:
         result = await client.execute_workflow(
             MessageWorkflow.run,
-            asrparams,
+            params,
             id=f"test-workflow-{uuid4()}",
             task_queue="test-queue",
         )
@@ -42,10 +46,10 @@ async def run_multiple_workflows(workflow_params: List[SaveMessageSchema]):
 if __name__ == "__main__":
     params_list = [
         SaveMessageSchema(
-            message="🦄Hello world",
+            message="🦄 Hello, World!",
         ),
         SaveMessageSchema(
-            message="🐰Bye world",
+            message="🐰 Bye, World!",
         ),
     ]
     # Run the workflow

@@ -1,4 +1,4 @@
-from pydantic_settings import BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
 from pprint import pprint
 
 
@@ -10,9 +10,15 @@ class Settings(BaseSettings):
 
     # Temporal server configuration
     TEMPORAL_SERVER_ENDPOINT: str
-    TEMPORAL_SERVER_PORT: int
+    TEMPORAL_SERVER_PORT: int | None = None
     TEMPORAL_NAMESPACE: str
-    TEMPORAL_API_KEY: str
+    TEMPORAL_API_KEY: str | None = None
+
+
+    # Application data storage configuration
+    BUCKET_NAME: str  # AWS S3 bucket name for storing data
+
+    model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
 
 
 # Instantiate settings
