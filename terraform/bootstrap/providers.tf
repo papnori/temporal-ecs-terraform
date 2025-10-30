@@ -10,9 +10,7 @@ terraform {
     key          = "bootstrap/terraform.tfstate"         # path to the state file in the bucket
     region       = "us-east-1"                           # region of the bucket
     use_lockfile = true                                  # instead of dynamodb
-
     encrypt = true # encrypt the state file
-
   }
   # ============================ END OF REMOTE BACKEND STATE FILE STORAGE ============================
   # RUN EVERYTHING BELOW THIS LINE, FIRST!

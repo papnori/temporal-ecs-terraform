@@ -19,7 +19,6 @@ locals {
     TEMPORAL_NAMESPACE       = local.secrets_json["TEMPORAL_NAMESPACE"]
     TEMPORAL_API_KEY         = try(sensitive(local.secrets_json["TEMPORAL_API_KEY"]), null) # Mark API key as sensitive
   }
-
 }
 
 ###########################################################################
