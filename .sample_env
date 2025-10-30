@@ -1,0 +1,10 @@
+##############################################################################
+# Sample environment variables file.
+# Create a copy of this file and name it .env and fill in the values.
+#
+# These are used to configure the run_worker.py and run_workflow.py scripts.
+##############################################################################
+TEMPORAL_NAMESPACE=default
+TEMPORAL_SERVER_ENDPOINT=<TEMPORAL_SERVER_ENDPOINT>  # Either Temporal Cloud or local self-hosted
+TEMPORAL_SERVER_PORT=7233  # Comment out if using endpoint that is tunnelled through Ngrok
+BUCKET_NAME=<AWS_S3_BUCKET_NAME>  # Name of the bucket to use for storing data, same as the one used in Terraform

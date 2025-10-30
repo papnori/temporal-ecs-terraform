@@ -1,33 +1,36 @@
-# Use a Python image with uv pre-installed
-FROM ghcr.io/astral-sh/uv:python3.12-bookworm-slim
+# syntax=docker/dockerfile:1
+FROM python:3.12-slim
 
-# Set the working directory inside the container
+LABEL maintainer="Nora Pap"
+LABEL email="Nori.753@gmail.com"
+LABEL description="Dockerfile for Temporal Worker"
+
+# Create working directory
 WORKDIR /app
 
-# Enable bytecode compilation
-ENV UV_COMPILE_BYTECODE=1
+# Copy dependency files first (for better layer caching)
+COPY Pipfile Pipfile.lock /app/
 
-# Copy from the cache instead of linking since it's a mounted volume
-ENV UV_LINK_MODE=copy
+# Update apt and clean up cache to reduce image size
+RUN apt-get update && \
+    apt-get autoremove -y && \
+    rm -rf /var/lib/apt/lists/*
 
-# Install the project's dependencies using the lockfile and settings
-RUN --mount=type=cache,target=/root/.cache/uv \
-    --mount=type=bind,source=uv.lock,target=uv.lock \
-    --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
-    uv sync --frozen --no-install-project --no-dev
 
-# Then, add the rest of the project source code and install it
-# Installing separately from its dependencies allows optimal layer caching
-ADD . .
-RUN --mount=type=cache,target=/root/.cache/uv \
-    uv sync --frozen --no-dev
+# Install dependencies
+RUN pip install --no-cache-dir pipenv && \
+    pipenv install --system --deploy --verbose --clear && \
+    pip uninstall pipenv -y
 
-# Place executables in the environment at the front of the path
-ENV PATH="/app/.venv/bin:$PATH"
 
-# Reset the entrypoint, don't invoke `uv`
-ENTRYPOINT []
+# Copy only the necessary application files
+COPY config.py run_worker.py /app/
+COPY activities/ /app/activities/
+COPY workflows/ /app/workflows/
+COPY schemas/ /app/schemas/
+
+# Set environment variable to ensure Python output is not buffered
+ENV PYTHONUNBUFFERED=1
 
 # Run the worker
 CMD ["python", "run_worker.py"]
-
