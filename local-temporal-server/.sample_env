@@ -1,0 +1,15 @@
+#############################################################################################################
+# Sample environment variables file.
+# Create a copy of this file and name it .env and fill in the values.
+#
+# These are used to configure Ngrok so that the local Temporal Server
+# can be accessed from the internet.
+#
+# Replace values with your own ngrok authtoken from https://dashboard.ngrok.com/get-started/your-authtoken
+# and the ngrok dev domain URL from https://dashboard.ngrok.com/domains.
+#
+# NOTE: when pasting the ngrok dev domain URL, make sure to remove the "https://" prefix.
+############################################################################################################
+
+NGROK_AUTHTOKEN=<NGROK_AUTHTOKEN>
+NGROK_URL=<NGROK_URL>

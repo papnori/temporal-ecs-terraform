@@ -1,0 +1,27 @@
+services:
+  temporal:
+    image: temporalio/temporal:latest
+    command: server start-dev --ip 0.0.0.0
+    ports:
+      - "7233:7233"
+      - "8233:8233"
+    restart: unless-stopped
+    networks:
+      - temporal-net
+
+  ngrok:
+    image: ngrok/ngrok:latest
+    depends_on:
+      - temporal
+    environment:
+      - NGROK_AUTHTOKEN=${NGROK_AUTHTOKEN}
+    command: http --app-protocol=http2 --url=${NGROK_URL} 7233
+    network_mode: host
+    stdin_open: true
+    tty: true
+    restart: unless-stopped
+
+networks:
+  temporal-net:
+    driver: bridge
+
