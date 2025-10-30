@@ -1,6 +1,6 @@
 module "ecs_service" {
   source  = "terraform-aws-modules/ecs/aws//modules/service"
-  version = "5.12.1"
+  version = "6.6.1"
 
   name        = var.name
   cluster_arn = var.cluster_arn
@@ -13,23 +13,11 @@ module "ecs_service" {
   container_definitions  = var.container_definitions
   enable_execute_command = true
 
-  subnet_ids           = var.subnet_ids
-  security_group_rules = var.security_group_rules
-  network_mode         = var.network_mode
+  subnet_ids                   = var.subnet_ids
+  security_group_ingress_rules = var.security_group_ingress_rules
+  security_group_egress_rules  = var.security_group_egress_rules
 
-
-  # Explicitly define task role permissions
-  task_exec_iam_statements = {
-    s3access = {
-      effect = "Allow",
-      actions = [
-        "s3:GetObject",
-        "s3:PutObject",
-        "s3:ListBucket"
-      ],
-      resources = ["arn:aws:s3:::*"]
-    }
-  }
+  network_mode = var.network_mode
 
   # Autoscaling configuration
   autoscaling_max_capacity = var.autoscaling_max_capacity

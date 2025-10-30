@@ -35,3 +35,8 @@ output "nat_public_ips" {
   description = "Public IPs of the NAT gateways"
   value       = module.vpc.nat_public_ips
 }
+
+output "s3_bucket_name" {
+  description = "Name of the S3 bucket for application data"
+  value       = aws_s3_bucket.message_storage.arn
+}

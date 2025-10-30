@@ -23,7 +23,7 @@ output "security_group_id" {
 }
 
 
-output "task_role_name" {
-  description = "The name of the ECS task role."
+output "tasks_iam_role_name" {
+  description = "The name of the IAM role associated with the ECS tasks."
   value       = module.ecs_service.tasks_iam_role_name
 }

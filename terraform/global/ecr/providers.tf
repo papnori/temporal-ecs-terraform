@@ -3,29 +3,30 @@ terraform {
   # The backend configuration for storing Terraform state.
   backend "s3" {
     bucket  = "my-little-sample-terraform-state"
-    key     = "live/dev/terraform.tfstate"
+    key     = "global/ecr/terraform.tfstate"
     region  = "us-east-1"
     encrypt = true
   }
 
-  required_version = ">= 1.0.0"
-
+  # Required providers for this Terraform configuration.
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "~> 6.0" # Update to at least 5.0 or higher
+      version = "~> 6.0"
     }
   }
+
+  required_version = ">= 1.0"
 }
 
+
 provider "aws" {
-  # Configuration options
-  region = "us-east-1"
+  region = "us-east-1" # Default AWS region for this configuration
 
   default_tags {
     tags = {
       CreatedBy   = "Skinsight DevOps Team"
-      Environment = "dev"
+      Environment = "global"
       Project     = "temporal-ecs-terraform"
       ManagedBy   = "Terraform"
     }

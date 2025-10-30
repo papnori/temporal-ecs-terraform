@@ -65,28 +65,11 @@ variable "worker_container_image" {
   type        = string
 }
 
-# ------   Backend environment variables & secrets ------
-variable "temporal_server_endpoint" {
-  description = "Endpoint for the Temporal server"
-  type        = string
-  default     = null
-}
+##############################################################################
+# S3 Application Data Bucket Configuration Variables
+##############################################################################
 
-variable "temporal_server_port" {
-  description = "Port for the Temporal server"
-  type        = number
-  default     = 7233
-}
-
-variable "temporal_namespace" {
-  description = "Namespace for the Temporal server"
+variable "s3_data_bucket_name" {
+  description = "Name of the S3 data bucket"
   type        = string
-  default     = null
-}
-
-variable "temporal_api_key" {
-  description = "API key for the Temporal server"
-  type        = string
-  sensitive   = true
-  default     = null
 }

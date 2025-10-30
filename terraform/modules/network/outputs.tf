@@ -24,7 +24,6 @@ output "internet_gateway_arn" {
 
 }
 
-
 output "nat_gateway_ids" {
   description = "IDs of the NAT gateways"
   value       = module.vpc.nat_ids
@@ -36,7 +35,6 @@ output "nat_public_ips" {
 
 }
 
-
 output "vpc_cidr_block" {
   description = "CIDR block of the VPC"
   value       = module.vpc.vpc_cidr_block
@@ -46,4 +44,9 @@ output "vpc_cidr_block" {
 output "private_route_table_ids" {
   description = "IDs of the private route tables"
   value       = module.vpc.private_route_table_ids
+}
+
+output "vpc_endpoints" {
+  description = "Array containing the full resource object and attributes for all endpoints created"
+  value       = module.vpc_endpoints.endpoints
 }

@@ -7,7 +7,7 @@
 
 module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
-  version = "5.21.0"
+  version = "6.4.0"
 
   name = var.name
   cidr = var.cidr
@@ -23,14 +23,14 @@ module "vpc" {
   tags = var.tags
 }
 
-
 #######################################################################
-# VPC Endpoints
+# VPC Endpoints Module
+# This module creates VPC endpoints for AWS services
 #######################################################################
 
 module "vpc_endpoints" {
   source  = "terraform-aws-modules/vpc/aws//modules/vpc-endpoints"
-  version = "5.21.0"
+  version = "6.4.0"
 
   vpc_id = module.vpc.vpc_id
 

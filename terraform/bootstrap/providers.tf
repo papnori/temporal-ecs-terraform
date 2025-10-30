@@ -7,9 +7,9 @@ terraform {
 
   backend "s3" {
     bucket       = "my-little-sample-terraform-state" # name of the bucket globally unique
-    key          = "bootstrap/terraform.tfstate"      # path to the state file in the bucket
-    region       = "us-east-1"                        # region of the bucket
-    use_lockfile = true                               # instead of dynamodb
+    key          = "bootstrap/terraform.tfstate"         # path to the state file in the bucket
+    region       = "us-east-1"                           # region of the bucket
+    use_lockfile = true                                  # instead of dynamodb
 
     encrypt = true # encrypt the state file
 
@@ -21,7 +21,7 @@ terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "~> 5.0"
+      version = "~> 6.0"
     }
   }
 
@@ -35,7 +35,7 @@ provider "aws" {
     tags = {
       "CreatedBy"   = "Skinsight DevOps Team"
       "Environment" = "bootstrap"
-      "Project"     = "Sample"
+      "Project"     = "temporal-ecs-terraform"
       "ManagedBy"   = "Terraform"
     }
   }

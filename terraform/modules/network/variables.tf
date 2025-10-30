@@ -28,13 +28,6 @@ variable "public_subnets" {
   type        = list(string)
 }
 
-
-variable "vpc_endpoints" {
-  description = "Map of VPC endpoints to create"
-  type        = map(any)
-  default     = {}
-}
-
 ################################################################
 # OPTIONAL VARIABLES
 ################################################################
@@ -54,5 +47,11 @@ variable "enable_single_nat_gateway" {
 variable "tags" {
   description = "Tags applied to all VPC resources"
   type        = map(string)
+  default     = {}
+}
+
+variable "vpc_endpoints" {
+  description = "Map of VPC endpoints to create"
+  type        = map(any)
   default     = {}
 }
