@@ -175,6 +175,11 @@ temporal-ecs-terraform/
 ├── activities/                             # Temporal activity definitions
 │   └── sample_activity.py                  # Example activity (business logic step)
 │
+├── local-temporal-server/                  # Local Temporal Server setup (optional)
+│   ├── .sample_env                         # Sample environment variable template
+│   ├── docker-dompose.yml                  # Docker Compose for local Temporal Server
+│   └── README.md                           # Local Temporal Server documentation
+|
 ├── schemas/                                # Data models / payload definitions
 │   └── sample_schema.py                    # Example Python dataclass schema for workflow input
 │
