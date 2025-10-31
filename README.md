@@ -400,9 +400,10 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 - But most and foremost to [Rafay](https://www.linkedin.com/in/rafay-khan-02939b145/) - whose relentless drive, guidance, and hands-on contributions not only shaped this project but continue to inspire everyone around him 💪✨ None of this would’ve come together without his push to make it happen 😊💜
 ---
 
-<div style="text-align: center;">
+<div align="center">
 
 **If this helped you, consider giving it a ⭐!**
 
-Made with 🧙‍♂️ by Nora From  🇭🇺
+Made with ☕️ and ✨ by Nora
+
 </div>
