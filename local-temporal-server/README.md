@@ -264,7 +264,7 @@ This is perfect for testing infrastructure changes without using Temporal Cloud 
 - [ngrok Documentation](https://ngrok.com/docs)
 - [Docker Compose Reference](https://docs.docker.com/compose/)
 - [Main Project Guide](../README.md)
-- [Full Blog Tutorial](../Archive/my_life_achievement.md)
+- [Full Blog Tutorial](https://papnori.github.io/posts/temporal-ecs-terraform/)
 
 ---
 
